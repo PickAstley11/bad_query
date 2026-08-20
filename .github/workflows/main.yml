@@ -5,27 +5,17 @@ on:
 
 jobs:
   build:
-    runs-on: macos-26
+    runs-on: xcode-27
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Select Xcode 27
+      - name: Verify Xcode 27
         run: |
-          XCODE_PATH=$(find /Applications -maxdepth 1 -type d -name "Xcode_27*.app" | head -n 1)
-
-          if [ -z "$XCODE_PATH" ]; then
-            echo "Xcode 27 was not found."
-            echo "Installed Xcode versions:"
-            ls -d /Applications/Xcode*.app 2>/dev/null || true
-            exit 1
-          fi
-
-          echo "Using: $XCODE_PATH"
-          sudo xcode-select -s "$XCODE_PATH"
-
+          xcode-select -p
           xcodebuild -version
+          xcodebuild -showsdks
 
       - name: Show project information
         run: |
@@ -56,7 +46,7 @@ jobs:
           cd build
           zip -r bad_query-unsigned.ipa Payload
 
-      - name: Upload unsigned IPA
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: bad_query-unsigned-IPA
